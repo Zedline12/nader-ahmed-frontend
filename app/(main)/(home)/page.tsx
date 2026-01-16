@@ -8,21 +8,22 @@ import FeaturedProductsGrid from "@/features/products/featuredProductsGrid/Featu
 export default async function Home() {
   const courses = await getCourses();
 
-  return (
-    <main className="min-h-screen bg-white pt-16">
-      <NavBar />
-      <Hero />
-      <CoursesGrid courses={courses} />
-        <div className="text-center mb-16">
-          <h2 className="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 md:text-4xl">
-            Featured <span className="text-secondary">Products</span>
-          </h2>
-          <p className="max-w-2xl mx-auto text-gray-500 md:text-lg">
-            Check out our top selected lifestyle products.
-          </p>
-        </div>
-      <FeaturedProductsGrid />
-      <Footer />
-    </main>
-  );
+  // return (
+  //   <main className="min-h-screen bg-white pt-16">
+  //     <NavBar />
+  //     <Hero />
+  //     <CoursesGrid courses={courses} />
+  //       <div className="text-center mb-16">
+  //         <h2 className="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 md:text-4xl">
+  //           Featured <span className="text-secondary">Products</span>
+  //         </h2>
+  //         <p className="max-w-2xl mx-auto text-gray-500 md:text-lg">
+  //           Check out our top selected lifestyle products.
+  //         </p>
+  //       </div>
+  //     {/* <FeaturedProductsGrid /> */}
+  //     <Footer />
+  //   </main>
+  // );
+  return <h1>Connecting to the server</h1>;
 }
