@@ -43,7 +43,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             ${product.price.toFixed(2)}
           </div>
           <Link
-            href={`/products/${product.slug}`}
+            href={`/products/${product.id}`}
             className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg group-hover:bg-secondary transition-colors"
           >
             <ShoppingBag className="w-4 h-4 mr-2" />

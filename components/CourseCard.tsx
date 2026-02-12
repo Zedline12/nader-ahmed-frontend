@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BookOpen, Clock, DollarSign } from "lucide-react";
-import { Course } from "../features/courses/services/courses";
+import { Course } from "@/features/courses/types/course";
 
 interface CourseCardProps {
   course: Course;
@@ -11,10 +11,13 @@ export default function CourseCard({ course }: CourseCardProps) {
     <div className="group flex flex-col h-full bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-xl hover:border-secondary/20 transition-all duration-300 overflow-hidden">
       {/* Image Placeholder */}
       <div className="relative h-48 w-full bg-gray-100 overflow-hidden">
-        {/* Since we don't have real images, we use a gradient placeholder */}
-        <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-gray-200 group-hover:scale-105 transition-transform duration-500"></div>
+        <img
+          src={course.thumbnail}
+          alt={course.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold text-secondary shadow-sm border border-gray-100">
-          {course.category}
+          {course.youtubeNiche}
         </div>
         <div className="absolute bottom-0 left-0 w-full h-1 bg-secondary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
       </div>
@@ -30,11 +33,11 @@ export default function CourseCard({ course }: CourseCardProps) {
         <div className="flex items-center space-x-4 text-xs font-medium text-gray-500 mb-6">
           <div className="flex items-center">
             <BookOpen className="w-4 h-4 mr-1 text-secondary" />
-            <span>12 Lessons</span>
+            <span>{course.totalLessons}</span>
           </div>
           <div className="flex items-center">
             <Clock className="w-4 h-4 mr-1 text-gray-400" />
-            <span>6h 30m</span>
+            <span>{course.totalDurationHours}</span>
           </div>
         </div>
 

@@ -1,5 +1,7 @@
-import { Course } from "../features/courses/services/courses";
+
+import { Course } from "@/features/courses/types/course";
 import CourseCard from "./CourseCard";
+import Link from "next/link";
 
 interface CoursesGridProps {
   courses: Course[];
@@ -20,7 +22,10 @@ export default function CoursesGrid({ courses }: CoursesGridProps) {
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {courses.map((course) => (
-            <CourseCard key={course.id} course={course} />
+               <Link key={course.id} href={`/courses/${course.id}`}>
+               
+              <CourseCard key={course.id} course={course} />
+              </Link>
           ))}
         </div>
 
