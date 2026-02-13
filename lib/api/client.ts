@@ -10,14 +10,15 @@ export async function apiFetch(path: string, options?: RequestInit) {
 
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${path}`, {
     ...options,
-    credentials: "include", // sends cookies
     headers,
   });
 
   let data;
   try {
     data = await response.json();
+    console.log(data)
   } catch (error) {
+    console.log(error)
     data = {};
   }
 

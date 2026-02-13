@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ProductsService } from "@/lib/api/services/products.service";
 import { toast } from "sonner";
 import { Product } from "@/lib/types/product.type";
-import { CategoriesDropdown } from "@/features/admin/components/CategoriesDropdown";
 
 interface EditProductFormProps {
   product: Product;
@@ -14,11 +13,6 @@ export function EditProductForm({ product }: EditProductFormProps) {
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState(product.title);
   const [description, setDescription] = useState(product.description || "");
-  // const [categoryId, setCategoryId] = useState(product.categoryId || ""); // Assuming product has categoryId, checking type definition...
-  // Product Type definition doesn't explicity show categoryId, but CreateDTO does.
-  // Let's assume we can't edit category comfortably without ID on Product type.
-  // Skipping Category edit or assuming it's not critical for now OR I need to add categoryId to Product type.
-  // Given user request "changing product details", title/description are main ones.
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,10 +35,10 @@ export function EditProductForm({ product }: EditProductFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 bg-white p-6 rounded-lg border border-gray-100 mb-8"
+      className=""
     >
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">Product Details</h2>
+        <h2 className="text-lg font-semibold text-primary-foreground">Product Details</h2>
         <button
           type="submit"
           disabled={loading}

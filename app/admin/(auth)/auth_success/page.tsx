@@ -29,7 +29,6 @@ export default function AuthSuccessPage() {
           },
           body: JSON.stringify({ exchangeToken }),
         });
-
         if (!res.ok) {
           toast.error("error")
           throw new Error("Token exchange failed");

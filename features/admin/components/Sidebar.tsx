@@ -36,6 +36,18 @@ const sidebarItems: SidebarItem[] = [
     type: "link",
   },
   {
+    label: "Categories",
+    icon: Package,
+    href: "/admin/categories",
+    type: "link",
+  },
+  {
+    label: "Admins",
+    icon: Users,
+    href: "/admin/admins",
+    type: "link",
+  },
+  {
     label: "Products",
     icon: Package,
     href: "/admin/products",

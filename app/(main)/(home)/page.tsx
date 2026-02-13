@@ -9,7 +9,6 @@ import { fetchWithToken } from "@/lib/fetcher";
 export default async function Home() {
   const courses = await fetchWithToken(`/courses`);
   const coursesData = await courses.json().then(d=>d.data);
-  console.log(coursesData)
   return (
     <main className="min-h-screen bg-white pt-16">
       <NavBar />

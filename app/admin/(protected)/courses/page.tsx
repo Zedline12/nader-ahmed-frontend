@@ -20,7 +20,7 @@ export default async function CoursesPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {courses.map((course) => (
-          <Link key={course.id} href={`/dashboard/courses/${course.id}`}>
+          <Link key={course.id} href={`/admin/courses/${course.id}`}>
             <AdminCourseCard key={course.id} course={course} />
           </Link>
         ))}

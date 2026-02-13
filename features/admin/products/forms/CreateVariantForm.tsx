@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ColorSelect } from "./ColorSelect";
-import { SizeSelect } from "./SizeSelect";
+import { ColorSelect } from "../components/ColorSelect";
+import { SizeSelect } from "../components/SizeSelect";
 import { ProductsService } from "@/lib/api/services/products.service";
 import { toast } from "sonner";
 import { Upload, X } from "lucide-react";
@@ -58,7 +58,7 @@ export function CreateVariantForm() {
     try {
       await ProductsService.addVariant(productId, formData);
       toast.success("Variant created successfully");
-      router.push(`/dashboard/products`);
+      router.push(`/admin/products`);
       router.refresh();
     } catch (error: any) {
       console.error("Error creating variant", error);

@@ -33,7 +33,7 @@ export default async function AdminLayout({
              <div className="hidden z-50  sm:block row-start-2 col-start-1 h-full">
                <AdminSidebar />
              </div>
-             <main className="row-start-2 p-5 h-full col-start-1 sm:col-start-2  ">
+             <main className="row-start-2 p-10 h-full col-start-1 sm:col-start-2  ">
                {children}
              </main>
            </div>

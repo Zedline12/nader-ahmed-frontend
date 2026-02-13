@@ -1,203 +1,197 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { ProductsService } from "@/lib/api/services/products.service";
-import { CategoriesDropdown } from "./CategoriesDropdown";
+import { productSchema } from "@/features/products/schemas/product";
 import { VariationType } from "@/lib/types/product.type";
-import { X, Plus } from "lucide-react";
+import { createProduct } from "@/features/products/actions/product";
+import { Plus, Trash2 } from "lucide-react";
+import { Category } from "@/features/categories/types/category";
 
-export const CreateProductForm = () => {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
+type CreateProductFormValues = z.infer<typeof productSchema>;
 
-  // Form State
-  const [title, setTitle] = useState("");
-  const [variationType, setVariationType] = useState<string>(
-    VariationType.NONE
-  );
-  const [description, setDescription] = useState("");
-  const [about, setAbout] = useState<string[]>([""]);
-  const [details, setDetails] = useState("{}"); // JSON string for flexibility
-  const [categoryId, setCategoryId] = useState("");
+interface CreateProductFormProps {
+  onSuccess?: () => void;
+  categories: Category[];
+}
 
-  const handleAboutChange = (index: number, value: string) => {
-    const newAbout = [...about];
-    newAbout[index] = value;
-    setAbout(newAbout);
-  };
+export function CreateProductForm({
+  onSuccess,
+  categories,
+}: CreateProductFormProps) {
+  const [isPending, startTransition] = useTransition();
 
-  const addAboutItem = () => {
-    setAbout([...about, ""]);
-  };
+  const form = useForm<CreateProductFormValues>({
+    resolver: zodResolver(productSchema),
+    defaultValues: {
+      title: "",
+      categoryId: "",
+      variationType: VariationType.NONE,
+      description: "",
+      about: [""],
+    },
+  });
 
-  const removeAboutItem = (index: number) => {
-    const newAbout = about.filter((_, i) => i !== index);
-    setAbout(newAbout);
-  };
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "about" as never, // casting to never or any because of potentially complex type inference issues with string arrays in z.infer
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  function onSubmit(data: CreateProductFormValues) {
+    startTransition(async () => {
+      const result = await createProduct(data);
 
-    if (!title || !categoryId || !variationType) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
-    let parsedDetails = {};
-    try {
-      parsedDetails = JSON.parse(details);
-    } catch (error) {
-      toast.error("Invalid JSON in Details field");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await ProductsService.create({
-        title,
-        variationType: variationType as VariationType,
-        description,
-        about: about.filter((item) => item.trim() !== ""), // Remove empty strings
-        details: parsedDetails,
-        categoryId,
-      });
-      toast.success("Product created successfully");
-      router.push("/dashboard/products"); // Redirect to products list (assumed path)
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to create product");
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (result.success) {
+        toast.success("Product created successfully");
+        form.reset();
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        toast.error(result.error || "Something went wrong");
+      }
+    });
+  }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-6 max-w-2xl bg-white p-6 rounded-lg shadow-sm border border-gray-100"
-    >
-      <div>
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">
-          Create New Product
-        </h2>
-      </div>
-
-      {/* Title */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Title *
-        </label>
-        <input
-          type="text"
-          required
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-          placeholder="Product Title"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem className="text-primary-foreground">
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input placeholder="Product Title" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-
-      {/* Category */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Category *
-        </label>
-        <CategoriesDropdown value={categoryId} onChange={setCategoryId} />
-      </div>
-
-      {/* Variation Type */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Variation Type *
-        </label>
-        <select
-          value={variationType}
-          onChange={(e) => setVariationType(e.target.value)}
-          className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-        >
-          {Object.values(VariationType).map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Description */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Description
-        </label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-          placeholder="Product Description"
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="categoryId"
+            render={({ field }) => (
+              <FormItem className="text-primary-foreground">
+                <FormLabel>Category</FormLabel>
+                <FormControl>
+                  <select
+                    {...field}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="" disabled>
+                      Select a category
+                    </option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.title}
+                      </option>
+                    ))}
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="variationType"
+            render={({ field }) => (
+              <FormItem className="text-primary-foreground">
+                <FormLabel>Variation Type</FormLabel>
+                <FormControl>
+                  <select
+                    {...field}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value={VariationType.NONE}>None</option>
+                    <option value={VariationType.ONLYSIZE}>Size Only</option>
+                    <option value={VariationType.ONLYCOLOR}>Color Only</option>
+                    <option value={VariationType.SIZEANDCOLOR}>
+                      Size & Color
+                    </option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem className="text-primary-foreground">
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Product description..."
+                  className="resize-none"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-
-      {/* About (Multiple Inputs) */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          About
-        </label>
         <div className="space-y-2">
-          {about.map((item, index) => (
-            <div key={index} className="flex gap-2">
-              <input
-                type="text"
-                value={item}
-                onChange={(e) => handleAboutChange(index, e.target.value)}
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-                placeholder="Feature point..."
+          <FormLabel>About This Item</FormLabel>
+          {fields.map((field, index) => (
+            <div key={field.id} className="flex gap-2">
+              <FormField
+                control={form.control}
+                name={`about.${index}`}
+                render={({ field }) => (
+                  <FormItem className="flex-1 border-none text-primary-foreground">
+                    <FormControl>
+                      <Input placeholder="Feature point..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {about.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeAboutItem(index)}
-                  className="p-2 text-red-500 hover:bg-red-50 rounded-md"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
+              <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                onClick={() => remove(index)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           ))}
-          <button
+          <Button
             type="button"
-            onClick={addAboutItem}
-            className="flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium"
+            variant="outline"
+            size="sm"
+            onClick={() => append("")}
+            className="mt-2"
           >
-            <Plus className="h-4 w-4 mr-1" /> Add Item
-          </button>
+            <Plus className="mr-2 h-4 w-4" /> Add Point
+          </Button>
         </div>
-      </div>
-
-      {/* Details (JSON) */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Details (JSON)
-        </label>
-        <textarea
-          value={details}
-          onChange={(e) => setDetails(e.target.value)}
-          className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 font-mono text-xs"
-          placeholder='{"weight": "1kg", "material": "Cotton"}'
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          Enter details as a valid JSON object.
-        </p>
-      </div>
-
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full h-10 bg-black text-white rounded-md font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        {loading ? "Creating..." : "Create Product"}
-      </button>
-    </form>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={isPending}>
+            {isPending ? "Creating..." : "Create Product"}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
-};
+}

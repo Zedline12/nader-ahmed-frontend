@@ -22,7 +22,7 @@ export function ProductCard({ product }: ProductCardProps) {
     product;
 
   return (
-    <Link href={`/dashboard/products/${id}`}>
+    <Link href={`/admin/products/${id}`}>
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
       <div className="relative h-48 w-full bg-gray-100">
         {thumbnailUrl ? (
@@ -68,9 +68,9 @@ export function ProductCard({ product }: ProductCardProps) {
           </span>
         </div>
 
-        {variantsList && variantsList.length > 0 && (
+        {/* {variantsList && variantsList.length > 0 && (
           <ProductVariants variantsList={variantsList} />
-        )}
+        )} */}
       </div>
       </div>
       </Link>

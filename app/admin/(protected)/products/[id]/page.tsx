@@ -4,7 +4,7 @@ import { useEffect, useState, use } from "react";
 // import { useParams } from "next/navigation"; // useParams in client component
 import { ProductsService } from "@/lib/api/services/products.service";
 import { Product, ProductVariant } from "@/lib/types/product.type";
-import { EditProductForm } from "@/features/admin/products/components/EditProductForm";
+import { EditProductForm } from "@/features/admin/products/forms/EditProductForm";
 import { VariantsList } from "@/features/admin/products/components/VariantsList";
 import { Modal } from "@/features/admin/components/ui/Modal";
 import { VariantForm } from "@/features/admin/products/components/VariantForm";
@@ -78,14 +78,18 @@ export default function EditProductPage({
   if (!product) return <div className="p-8">Product not found</div>;
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-8">
+    <div className="p-8 max-w-5xl mx-auto space-y-8 bg-background-light">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
-        <p className="text-gray-500">Manage product details and variants</p>
+        <h1 className="text-2xl font-bold text-primary-foreground">
+          Edit Product
+        </h1>
+        <p className="text-secondary-foreground">
+          Manage product details and variants
+        </p>
       </div>
-
-      <EditProductForm product={product} />
-
+      <div className="text-secondary-foreground  rounded-lg border border-gray-100 mb-8">
+        <EditProductForm product={product} />
+      </div>
       <VariantsList
         variants={product.variantsList || []}
         onAdd={handleAddVariant}

@@ -9,7 +9,7 @@ export const ProductsService = {
   },
 
   findOne: async (id: string): Promise<Product> => {
-    return await apiFetch(`products/${id}`, {
+    return await apiFetch(`admin/products/${id}/aggregated`, {
       method: "GET",
     });
   },
